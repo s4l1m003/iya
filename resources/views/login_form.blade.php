@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk (Login) - Aplikasi Properti</title>
+    <title>Halaman Masuk - Aplikasi Properti</title>
     <!-- Memuat Tailwind CSS CDN untuk styling yang mudah dan responsif -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -31,6 +31,7 @@
         @endif
 
         @if($errors->any())
+            <!-- Menampilkan pesan error validasi (yang dikirim dari Controller) -->
             <div class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
                 Kredensial atau input tidak valid. Mohon periksa kembali.
             </div>
@@ -43,9 +44,9 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
-                              focus:ring-indigo-500 focus:border-indigo-500 @error('email') border-red-500 @enderror" 
-                       placeholder="Masukkan email Anda">
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+                                 focus:ring-indigo-500 focus:border-indigo-500 @error('email') border-red-500 @enderror" 
+                        placeholder="Masukkan email Anda">
                 @error('email')
                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                 @enderror
@@ -55,9 +56,9 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Kata Sandi</label>
                 <input id="password" type="password" name="password" required 
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
-                              focus:ring-indigo-500 focus:border-indigo-500 @error('password') border-red-500 @enderror" 
-                       placeholder="Masukkan kata sandi">
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
+                                 focus:ring-indigo-500 focus:border-indigo-500 @error('password') border-red-500 @enderror" 
+                        placeholder="Masukkan kata sandi">
                 @error('password')
                     <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                 @enderror

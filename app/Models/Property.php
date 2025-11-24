@@ -9,24 +9,35 @@ class Property extends Model
 {
     use HasFactory;
 
+    // WAJIB: Tentukan nama tabel yang non-standar (sesuai database Anda)
     protected $table = 'tabel_property'; 
 
+    /**
+     * The attributes that are mass assignable.
+     * Pastikan semua kolom yang diisi di Seeder/Controller ada di sini.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'marketing_id',
+        'status',          // Dari migration Anda (pending, approved, sold)
+        'marketing_id',    // Kunci asing
         'judul',
         'deskripsi',
         'harga',
         'alamat',
         'luas_tanah',
         'luas_bangunan',
-        'gambar',
-        'status', 
-        'tanggal_upload',
-        'approved_by',
+        'gambar',          // Untuk menyimpan nama file gambar
     ];
 
+    /**
+     * Relasi dengan user (marketing) yang mengupload properti.
+     */
     public function marketing()
     {
-        return $this->belongsTo(User::class, 'marketing_id', 'id');
+        // Asumsi relasi ke Model User
+        return $this->belongsTo(User::class, 'marketing_id');
     }
+
+    // Anda bisa menambahkan relasi lain di sini jika diperlukan
 }
