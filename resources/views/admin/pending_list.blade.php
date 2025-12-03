@@ -1,101 +1,88 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Daftar Properti Menunggu Review</title>
-    {{-- Asumsi Anda menggunakan Vite untuk Tailwind CSS --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>Admin - Properti Pending</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        .container { max-width: 1400px; margin: 40px auto; padding: 20px; font-family: sans-serif; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background-color: #3b82f6; color: white; font-weight: bold; text-transform: uppercase; }
-        tr:nth-child(even) { background-color: #f9fafb; }
-        .btn-approve { background-color: #10b981; color: white; padding: 8px 12px; border-radius: 4px; transition: background-color 0.2s; }
-        .btn-delete { background-color: #ef4444; color: white; padding: 8px 12px; border-radius: 4px; transition: background-color 0.2s; }
-        .btn-submit { background-color: #0d9488; color: white; padding: 8px 12px; border-radius: 4px; text-decoration: none; }
-        .action-btns form, .action-btns a { display: inline-block; margin-right: 5px; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800 text-center">Daftar Properti Menunggu Persetujuan & Dijual</h1>
-        <p class="mb-4 text-center text-gray-600">Anda dapat menyetujui, menghapus, atau mencatat penjualan properti yang sudah disetujui di sini.</p>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-indigo-700 shadow p-4 flex justify-between items-center text-white">
+        <h1 class="text-2xl font-bold">Admin Panel (Pending)</h1>
+        <div>
+            <span class="mr-4">Halo, {{ auth()->user()->name }}</span>
+            <form action="{{ route('logout') }}" method="POST" class="inline">
+                @csrf
+                <button type="submit" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition duration-150">Logout</button>
+            </form>
+        </div>
+    </nav>
+    
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-6">Daftar Properti Menunggu Persetujuan</h2>
 
-        {{-- Pesan Status (Success/Error) --}}
-        @if (session('success'))
+        @if(session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                 <span class="block sm:inline">{{ session('success') }}</span>
             </div>
         @endif
-        @if (session('error'))
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
+
+        @if($properties->isEmpty())
+            <div class="text-center p-10 bg-white rounded-xl shadow-lg">
+                <p class="text-xl text-gray-500">Tidak ada properti yang sedang menunggu persetujuan.</p>
+            </div>
+        @else
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Properti</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marketing</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach($properties as $property)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {{ $property->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $property->marketing_id }} 
+                                {{-- Jika Anda punya relasi, gunakan: $property->marketing->name --}}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    {{ $property->status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
+                                {{-- Form Persetujuan --}}
+                                <form action="{{ route('admin.approve', $property) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-green-600 hover:text-green-900 border border-green-500 px-2 py-1 rounded-lg text-xs font-semibold">
+                                        Setujui
+                                    </button>
+                                </form>
+                                {{-- Form Penolakan --}}
+                                <form action="{{ route('admin.reject', $property) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-red-600 hover:text-red-900 border border-red-500 px-2 py-1 rounded-lg text-xs font-semibold">
+                                        Tolak
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         @endif
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Judul Properti</th>
-                    <th>Marketing</th>
-                    <th>Harga</th>
-                    <th>Status</th>
-                    <th>Tanggal Upload</th>
-                    <th style="width: 250px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($properties as $property)
-                    <tr>
-                        <td>{{ $property->id }}</td>
-                        <td>
-                            <a href="{{ route('property.show', $property->id) }}" class="text-blue-600 hover:text-blue-800 font-medium">
-                                {{ $property->judul }}
-                            </a>
-                        </td>
-                        <td>{{ $property->marketing->name ?? 'N/A' }}</td>
-                        <td>Rp {{ number_format($property->harga, 0, ',', '.') }}</td>
-                        <td>
-                            <span class="px-3 py-1 text-sm font-semibold rounded-full 
-                                @if($property->status === 'pending') bg-yellow-200 text-yellow-800
-                                @elseif($property->status === 'approved') bg-green-200 text-green-800
-                                @elseif($property->status === 'sold') bg-red-200 text-red-800
-                                @else bg-gray-200 text-gray-800
-                                @endif">
-                                {{ ucfirst($property->status) }}
-                            </span>
-                        </td>
-                        <td>{{ $property->created_at->format('d/m/Y') }}</td>
-                        <td class="action-btns">
-                            @if ($property->status === 'pending')
-                                {{-- Tombol APPROVE --}}
-                                <form method="POST" action="{{ route('admin.approve', $property->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-approve" onclick="return confirm('Yakin ingin menyetujui properti ini?');">Approve</button>
-                                </form>
-                            @elseif ($property->status === 'approved')
-                                {{-- Tombol RECORD SALE --}}
-                                <a href="{{ route('admin.transaction.create', $property->id) }}" class="btn-submit">Record Sale</a>
-                            @endif
-                            
-                            {{-- Tombol TOLAK (Hapus) --}}
-                            <form method="POST" action="{{ route('admin.delete', $property->id) }}" style="display: inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-delete" onclick="return confirm('Yakin ingin MENOLAK/MENGHAPUS properti ini?');">Tolak/Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="7" class="text-center py-6 text-gray-500">Tidak ada properti yang menunggu review atau tersedia untuk dijual.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+    </main>
 </body>
 </html>

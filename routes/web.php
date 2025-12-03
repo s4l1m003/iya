@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+// =========================================================================
+// PERBAIKAN PENTING: Menggunakan LoginController dari sub-folder 'Auth'
+// =========================================================================
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ContactController;
@@ -21,24 +25,23 @@ Route::get('/', [PropertyController::class, 'index'])->name('properties.index');
 Route::get('/property/{property}', [PropertyController::class, 'show'])->name('properties.show');
 Route::post('/contact/{property}', [ContactController::class, 'store'])->name('contact.store');
 
-// --- 2. AUTHENTIKASI (LOGIN & LOGOUT) ---
+// --- 2. AUTHENTIKASI (LOGIN, REGISTER, & LOGOUT) ---
 
-// Hanya gunakan LoginController yang Anda buat
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.store');
-
-// Route Logout (membutuhkan login)
-Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+// Route ini di-group dengan middleware 'guest' agar tidak bisa diakses saat sudah login
 Route::group(['middleware' => 'guest'], function () {
     
     // LOGIN
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.store');
+    Route::get('/login', [LoginController::class, 'create'])->name('login');    
+    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
-    // REGISTER (Perbaikan: Pastikan RegisterController di-import di atas)
+    // REGISTER
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register'])->name('register.store');
 });
+
+// Route Logout (membutuhkan login)
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+
 
 // --- 3. KELOMPOK ROUTE YANG MEMBUTUHKAN LOGIN ('auth' middleware) ---
 Route::middleware('auth')->group(function () {
@@ -52,11 +55,12 @@ Route::middleware('auth')->group(function () {
             return redirect()->route('marketing.properties.index');
         }
         // Jika hanya user biasa, arahkan ke dashboard/home
-        return view('welcome'); 
+        // PERBAIKAN KECIL: Memanggil view 'home' (tanpa .blade.php)
+        return view('home'); 
     })->name('dashboard');
 
     // --- A. ROUTE KHUSUS MARKETING ---
-    // Pastikan Gate 'isMarketing' sudah didaftarkan di AuthServiceProvider
+    // Gate 'isMarketing' akan memproteksi semua route di dalam group ini
     Route::middleware('can:isMarketing')->prefix('marketing')->name('marketing.')->group(function () {
         Route::get('/', [MarketingController::class, 'index'])->name('properties.index');
         Route::get('/create', [MarketingController::class, 'create'])->name('create');
@@ -65,7 +69,7 @@ Route::middleware('auth')->group(function () {
     });
     
     // --- B. ROUTE KHUSUS ADMIN ---
-    // Pastikan Gate 'isAdmin' sudah didaftarkan di AuthServiceProvider
+    // Gate 'isAdmin' akan memproteksi semua route di dalam group ini
     Route::middleware('can:isAdmin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/pending', [AdminController::class, 'pendingProperties'])->name('pending');
         Route::post('/approve/{property}', [AdminController::class, 'approve'])->name('approve');
@@ -75,6 +79,4 @@ Route::middleware('auth')->group(function () {
         Route::get('/transaction/create/{property}', [TransactionController::class, 'create'])->name('transactions.create');
         Route::post('/transaction/{property}', [TransactionController::class, 'store'])->name('transactions.store');
     });
-
-    // HAPUS SEMUA ROUTE YANG MERUJUK KE CONTROLLER BAWAAN LARAVEL DI SINI!
 });

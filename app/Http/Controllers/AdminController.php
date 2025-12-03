@@ -3,56 +3,39 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Property;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Property; // Pastikan Model Property di-import dengan benar
+use App\Models\User; // Asumsi jika ingin menampilkan nama marketing
 
 class AdminController extends Controller
 {
-    
-    public function pending()
+    // Method yang dipanggil oleh route admin.pending (route('admin.pending'))
+    public function pendingProperties()
     {
-        
-        $properties = Property::with('marketing')->where('status', 'pending')->latest()->get();
-        
-        return view('admin.pending_list', compact('properties'));
+        // Ambil semua properti dengan status 'pending'
+        // Jika Anda ingin mengikutkan data user marketing:
+        $properties = Property::where('status', 'pending')
+                             ->latest()
+                             ->get(); // Hapus ->paginate() jika tidak ingin pagination
+
+        // PASTIKAN VIEW YANG DIPANGGIL ADALAH VIEW KHUSUS ADMIN, BUKAN 'welcome'
+        return view('admin.pending', compact('properties'));
     }
 
-
+    // Method untuk menyetujui properti
     public function approve(Property $property)
     {
-        $property->update([
-            'status' => 'approved',
-            'approved_by' => Auth::id(), 
-        ]);
-        
-        return redirect()->route('admin.pending')->with('success', 'Properti berhasil disetujui dan telah tayang di katalog.');
-    }
-    
-    
-    public function destroy(Property $property)
-    {
-        
-        if ($property->gambar) {
-             
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($property->gambar);
-        }
-        
-        $property->delete();
-        
-        return redirect()->route('admin.pending')->with('success', 'Properti berhasil ditolak/dihapus dari sistem.');
+        $property->status = 'approved';
+        $property->save();
+
+        return back()->with('success', 'Properti berhasil disetujui dan kini tampil di katalog.');
     }
 
-
-    public function sold(Property $property)
+    // Method untuk menolak properti
+    public function reject(Property $property)
     {
-        $property->update(['status' => 'sold']);
-        return back()->with('success', 'Status properti berhasil diubah menjadi SOLD.');
-    }
-    
-    
-    public function commissionReport()
-    {
+        $property->status = 'rejected';
+        $property->save();
         
-        return view('pajak.report');
+        return back()->with('success', 'Properti berhasil ditolak.');
     }
 }
