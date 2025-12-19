@@ -6,7 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Session; // WAJIB: Import Facade Session
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth; // WAJIB: Import Facade Session
 
 class RegisterController extends Controller
 {
@@ -39,7 +40,7 @@ class RegisterController extends Controller
         ]);
 
         // 3. Login Otomatis dengan Session Manual (TIDAK ADA auth()->login() LAGI)
-        
+        Auth::login($user);
         // Simpan data user yang diperlukan ke dalam Session
         Session::put('user_id', $user->id);
         Session::put('user_name', $user->name);

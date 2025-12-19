@@ -23,12 +23,12 @@
         
         <!-- Pesan Status -->
         @if(Auth::check())
-            <div class="p-4 mb-6 text-base text-gray-700 bg-indigo-50 rounded-lg border border-indigo-200">
-                Halo, {{ Auth::user()->name ?? 'Pengguna' }} (ID: {{ Auth::user()->id }}).
-                <br>
-                Anda adalah pengguna dengan **Role ID: {{ Auth::user()->role_id }}**.
-            </div>
-        @endif
+    <div class="p-4 mb-6 text-base text-gray-700 bg-indigo-50 rounded-lg border border-indigo-200">
+        Halo, {{ Auth::user()->name ?? 'Pengguna' }} (ID: {{ Auth::user()->id }}).
+        <br>
+        Anda adalah pengguna dengan <strong>Role: {{ Auth::user()->role ?? Auth::user()->role_id ?? 'N/A' }}</strong>.
+    </div>
+@endif
 
         <!-- Tombol Log Out -->
         <form method="POST" action="{{ route('logout') }}" class="inline-block">

@@ -1,10 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-// =========================================================================
-// PERBAIKAN PENTING: Menggunakan LoginController dari sub-folder 'Auth'
-// =========================================================================
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\ContactController;
@@ -66,6 +63,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [MarketingController::class, 'create'])->name('create');
         Route::post('/', [MarketingController::class, 'store'])->name('store');
         Route::delete('/{property}', [MarketingController::class, 'destroy'])->name('destroy');
+        Route::get('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'destroy'])->name('profile.destroy');
     });
     
     // --- B. ROUTE KHUSUS ADMIN ---
