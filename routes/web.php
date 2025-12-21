@@ -17,8 +17,11 @@ use App\Http\Controllers\RegisterController;
 */
 
 // --- 1. HALAMAN PUBLIK (Tidak Perlu Login) ---
+Route::get('/', function () {
+    return view('home');
+})->name('home');
 
-Route::get('/', [PropertyController::class, 'index'])->name('properties.index');
+Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
 Route::get('/property/{property}', [PropertyController::class, 'show'])->name('properties.show');
 Route::post('/contact/{property}', [ContactController::class, 'store'])->name('contact.store');
 
@@ -35,7 +38,9 @@ Route::group(['middleware' => 'guest'], function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register'])->name('register.store');
 });
-
+Route::get('/home', function () {
+    return redirect()->route('properties.index');
+});
 // Route Logout (membutuhkan login)
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 

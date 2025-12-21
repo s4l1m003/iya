@@ -3,46 +3,54 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Property; 
-use App\Models\User;     
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PropertySeeder extends Seeder
 {
-    /**
-     * Jalankan database seeds.
-     */
     public function run(): void
     {
-        $marketingUser = DB::table('users')->where('role', 'marketing')->first();
-        $marketingId = $marketingUser ? $marketingUser->id : 4; // Default ID 4 jika tidak ditemukan
+        $now = Carbon::now();
 
-        Property::create([
-            'marketing_id' => $marketingId,
-            'judul' => 'Rumah Elit Citraland',
-            'deskripsi' => 'Rumah baru dua lantai, lokasi premium, dekat fasilitas umum.',
-            'harga' => 3500000000, 
-            'alamat' => 'Jl. Boulevard Raya No. 10, Citraland',
-            'luas_tanah' => 150,
-            'luas_bangunan' => 200,
-            'gambar' => 'properties/citraland_elite.jpg', 
-            'status' => 'approved', 
-            'tanggal_upload' => now(),
-            'approved_by' => 1, 
-        ]);
+        // cari id user marketing
+        $marketing = DB::table('users')->where('role', 'marketing')->first();
 
-        Property::create([
-            'marketing_id' => $marketingId,
-            'judul' => 'Tanah Kavling Investasi',
-            'deskripsi' => 'Tanah strategis di jalur utama, cocok untuk ruko atau gudang.',
-            'harga' => 950000000,
-            'alamat' => 'Jalan Bypass KM 5, Pinggiran Kota',
-            'luas_tanah' => 500,
-            'luas_bangunan' => 0, 
-            'gambar' => 'properties/kavling_bypass.jpg',
-            'status' => 'pending', 
-            'tanggal_upload' => now(),
-        ]);
-        
+        if (! $marketing) {
+            $this->command->info('No marketing user found, skipping property seeding.');
+            return;
+        }
+
+        $props = [
+            [
+                'user_id' => $marketing->id,
+                'judul' => 'Rumah Minimalis Contoh',
+                'deskripsi' => 'Rumah 2 kamar, lokasi strategis.',
+                'harga' => 450000000,
+                'alamat' => 'Jl. Contoh No.1',
+                'luas_tanah' => 100,
+                'luas_bangunan' => 80,
+                'gambar' => null,
+                'status' => 'published',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'user_id' => $marketing->id,
+                'judul' => 'Ruko Siap Pakai',
+                'deskripsi' => 'Ruko 2 lantai cocok untuk usaha.',
+                'harga' => 750000000,
+                'alamat' => 'Jl. Contoh No.2',
+                'luas_tanah' => 120,
+                'luas_bangunan' => 200,
+                'gambar' => null,
+                'status' => 'published',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ];
+
+        foreach ($props as $p) {
+            DB::table('properties')->insert($p);
+        }
     }
 }
