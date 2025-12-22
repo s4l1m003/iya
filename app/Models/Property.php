@@ -10,7 +10,7 @@ class Property extends Model
     use HasFactory;
 
     // WAJIB: Tentukan nama tabel yang non-standar (sesuai database Anda)
-    protected $table = 'tabel_property'; 
+    protected $table = 'properties';
 
     /**
      * The attributes that are mass assignable.
@@ -18,7 +18,7 @@ class Property extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
+    protected $guarded = [
         'status',          // Dari migration Anda (pending, approved, sold)
         'marketing_id',    // Kunci asing
         'judul',
